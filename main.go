@@ -2,18 +2,23 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 func main() {
-	message := make(chan string)
 
-	go func() {
-		time.Sleep(time.Microsecond) // sleep 1 microsecond
-		message <- "Hello word"
+	intCh := make(chan int)
 
-	}()
+	go factorial(5, intCh) // вызов горутины
+	fmt.Println(<-intCh)   // получение данных из канала
 
-	fmt.Println(<-message)
+}
 
+func factorial(n int, ch chan int) {
+
+	result := 1
+	for i := 1; i <= n; i++ {
+		result += i
+	}
+
+	ch <- result // отправка данных в канал
 }
