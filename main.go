@@ -9,7 +9,7 @@ func main() {
 	message := make(chan string)
 
 	go func() {
-		time.Sleep(time.Microsecond)
+		time.Sleep(time.Microsecond) // sleep 1 microsecond
 		message <- "Hello word"
 
 	}()
