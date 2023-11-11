@@ -6,7 +6,8 @@ import (
 )
 
 // функция для вычисления квадратов чисел
-func write(in chan int, out chan int, wg *sync.WaitGroup) {
+
+func square(in chan int, out chan int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for val := range in { //интерация по каналу in, на каждой итерации текущий поток блокируется до следующего значения в канале
 		square := val * val
@@ -17,6 +18,7 @@ func write(in chan int, out chan int, wg *sync.WaitGroup) {
 }
 
 func read(out chan int, wg *sync.WaitGroup) { //считываение данных из канала out
+
 	defer wg.Done()
 	for val := range out { //интерация по каналу out и вывод его переменных
 		fmt.Println(val)
@@ -31,13 +33,17 @@ func main() {
 
 	a := [3]int{1, 2, 3}
 
-	for _, val := range a { // цикл который передает все значения в канал in
-		in <- val
-	}
-	wg.Add(1)
-	go write(in, out, &wg) // горутниа которая возводит значения в квадрат канала in и передает их в канал out
+	wg.Add(3)
 
-	wg.Add(1)
+	go func(in chan int, wg *sync.WaitGroup) {
+		defer wg.Done()
+		for _, val := range a { // цикл который передает все значения в канал in
+			in <- val
+		}
+	}(in, &wg)
+
+	go square(in, out, &wg) // горутниа которая возводит значения в квадрат канала in и передает их в канал out
+
 	go read(out, &wg) // горунта которая выводит значения из канала out
 
 	close(in)
